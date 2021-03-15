@@ -1,0 +1,51 @@
+# set a variable for the location
+location="NorthCentralUS"
+
+# list providers of virtual machines 
+az vm image list-publishers --location $location --output Table
+
+
+# use provider from previous command and list images
+az vm image list-offers --location $location --publisher Canonical --output Table
+
+# get versions of images for that publisher
+az vm image list-skus --location $location --publisher Canonical --offer UbuntuServer --output Table
+
+
+# set a variable for the resource group name
+rgname="YourRGName"
+
+# create resource group and then create deployment
+# MAKE SURE YOU HAVE UPLOADED THE azuredeploy.json FILE TO THE CLOUD SHELL
+# UPDATE THE vmparams.json FILE WITH YOUR PARAMETER VALUES AND UPLOAD TO THE CLOUD SHELL
+
+az group create --name $rgname --location $location
+az group deployment create --template-file azuredeploy.json --parameters '@vmparams.json' --resource-group $rgname --output Table
+
+az vm list-ip-addresses -g $rgname 
+
+# ssh into the machine (get the IPADDRESS  from the output of the previous command)
+# ssh ADMINUSER@ipaddress
+
+# test out commands on the remote machine
+
+# logout of the remote machine or open a new terminal window
+
+
+
+
+
+#  CMS Made Simple image install
+# show images list for provider that supports CMS 
+az vm image list-skus --location $location --publisher Bitnami --offer cmsmadesimple
+
+# UPDATE THE refparams.json PARAMETERS FILE WITH YOUR PASSWORD
+
+# deploy the CMS and connect to the web interface
+az group deployment create --template-file cmstemplate.json --parameters '@refparams.json' --resource-group $rgname
+
+az vm list-ip-addresses -g $rgname --output table
+
+
+# browse to the public address for your VM
+
